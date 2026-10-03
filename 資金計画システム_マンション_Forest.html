@@ -671,6 +671,10 @@ table.loan-input td input.editable, table.loan-input td select.editable { backgr
   .btn-column button.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
   .btn-column button.primary:hover { background: var(--brand-dark); }
   .warn-note { color: #b4432f; }
+
+  /* 借入先：候補があることが分かる▼表示 */
+  input[list^="dl-prov"] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%231f5a49'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px !important; cursor: pointer; }
+  input[list^="dl-prov"]::-webkit-calendar-picker-indicator { opacity: 0; }
 }
 </style>
 </head>
@@ -3761,6 +3765,26 @@ function setupHeaderButtons(){
   render();
 })();
 
+</script>
+<script>
+/* 借入先欄：クリック時に入力済みの文字を一時的に空にし、全候補が表示されるようにする
+   （何も選ばずに離れた場合は元の値に戻る。選択内容の判定ロジックは既存のまま） */
+(function(){
+  var keep = null;
+  document.addEventListener('focusin', function(e){
+    var t = e.target;
+    if (t && t.matches && t.matches('input[list^="dl-prov"]') && t.value) {
+      keep = {el: t, v: t.value};
+      t.value = '';
+    }
+  });
+  document.addEventListener('focusout', function(e){
+    if (keep && e.target === keep.el) {
+      if (keep.el.value === '') keep.el.value = keep.v;
+      keep = null;
+    }
+  });
+})();
 </script>
 </body>
 </html>
